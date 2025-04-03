@@ -1,0 +1,42 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/1/Mux4Way16.hdl
+/**
+ * 4-way 16-bit multiplexor:
+ * out = a if sel = 00
+ *       b if sel = 01
+ *       c if sel = 10
+ *       d if sel = 11​
+ * 完整信号流图（含控制与数据路径）：
+ * 
+ * 控制流：
+ * sel[1] ────────────────┐
+ *                        ↓
+ * sel[0] ──┐             │
+ *          ↓             ↓
+ * 数据流： a[16] ─┬─Mux16─ ab[16] ───┐
+ *          b[16] ─┘                  │
+ *                                    Mux16─ out[16]
+ *          c[16] ─┬─Mux16─ cd[16] ───┘
+ *          d[16] ─┘
+ * 
+ * 控制信号说明：
+ * ────────────┬─────────────────────────────────
+ *   sel[1]    │ 决定最终选择层级（0选ab/1选cd）
+ *   sel[0]    │ 决定初级选择（0选a/c，1选b/d）
+ * ────────────┴─────────────────────────────────
+ */
+CHIP Mux4Way16 {
+    IN a[16], b[16], c[16], d[16], sel[2];
+    OUT out[16];
+    
+    PARTS:
+    //// Replace this comment with your code.
+        // 第一级：按sel[1]选择两组（符合图片中的总线分解原则）
+    Mux16(a=a[0..15], b=b[0..15], sel=sel[0], out=ab);
+    Mux16(a=c[0..15], b=d[0..15], sel=sel[0], out=cd);
+
+    // 第二级：按sel[1]确定最终输出（应用图片中的子总线组合）
+    Mux16(a=ab, b=cd, sel=sel[1], out=out[0..15]);
+}
