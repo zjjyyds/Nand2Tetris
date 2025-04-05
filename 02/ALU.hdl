@@ -1,0 +1,43 @@
+CHIP ALU {
+    IN  
+        x[16], y[16],  // 16位输入        
+        zx, // 是否将x置零？
+        nx, // 是否对x取反？
+        zy, // 是否将y置零？
+        ny, // 是否对y取反？
+        f,  // 计算(out = x + y)还是(out = x & y)？
+        no; // 是否对输出取反？
+    OUT 
+        out[16], // 16位输出
+        zr,      // 如果(out == 0)则为1，否则为0
+        ng;      // 如果(out < 0)则为1，否则为0
+
+    PARTS:
+        // 处理x输入：先清零(如果zx=1)，再取反(如果nx=1)
+        Mux16(a=x, b=false, sel=zx, out=x1);         // 如果zx=1则x置0
+        Not16(in=x1, out=notx);                     // 对x1取反
+        Mux16(a=x1, b=notx, sel=nx, out=xout);      // 根据nx选择x1或其取反
+
+        // 处理y输入：先清零(如果zy=1)，再取反(如果ny=1)
+        Mux16(a=y, b=false, sel=zy, out=y1);         // 如果zy=1则y置0
+        Not16(in=y1, out=noty);                     // 对y1取反
+        Mux16(a=y1, b=noty, sel=ny, out=yout);      // 根据ny选择y1或其取反
+
+        // 主计算：根据f选择加法或与操作
+        Add16(a=xout, b=yout, out=sum);             // 计算xout + yout
+        And16(a=xout, b=yout, out=andout);          // 计算xout & yout
+        Mux16(a=andout, b=sum, sel=f, out=result);  // 根据f选择结果
+
+        // 处理输出取反
+        Not16(in=result, out=notresult);            // 对结果取反
+        Mux16(a=result, b=notresult, sel=no, out=out, out[0..7]=outlow, out[8..15]=outhigh, out[15]=bit15);
+
+        // 计算zr标志：检查输出是否为0
+        Or8Way(in=outlow, out=orlow);               // 低8位或运算
+        Or8Way(in=outhigh, out=orhigh);             // 高8位或运算
+        Or(a=orlow, b=orhigh, out=orall);           // 合并结果
+        Not(in=orall, out=zr);                      // 如果全0则zr=1
+
+        // 计算ng标志：直接使用第15位
+        And(a=bit15, b=true, out=ng);               // ng等于最高位
+}
