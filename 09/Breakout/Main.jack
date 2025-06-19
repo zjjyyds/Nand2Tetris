@@ -1,0 +1,15 @@
+// File: Main.jack
+/**
+ * Breakout 游戏的主入口。
+ * 初始化并运行游戏。
+ */
+class Main {
+    /** 程序入口点 */
+    function void main() {
+        var BreakoutGame game; // 声明一个游戏变量
+        let game = BreakoutGame.new(); // 创建一个新的游戏实例
+        do game.run(); // 运行游戏
+        do game.dispose(); // 游戏结束后释放内存
+        return;
+    }
+}

@@ -1,0 +1,20 @@
+/**
+ * 数组操作库。
+ * Jack 语言没有内置的数组创建机制。
+ * 这个类允许我们动态地创建和销毁数组。
+ */
+class Array {
+    /** 创建一个指定大小的新数组。*/
+    function Array new(int size) {
+        if (size = 0) {
+            return 0;
+        }
+        return Memory.alloc(size);
+    }
+
+    /** 释放数组占用的内存。*/
+    function void dispose(Array this) {
+        do Memory.deAlloc(this);
+        return;
+    }
+}

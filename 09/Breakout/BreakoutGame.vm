@@ -1,0 +1,532 @@
+function BreakoutGame.new 3
+    push constant 6
+    call Memory.alloc 1
+    pop pointer 0
+    push constant 220
+    push constant 235
+    push constant 70
+    push constant 8
+    call Paddle.new 4
+    pop this 0
+    push constant 256
+    push constant 222
+    push constant 5
+    call Ball.new 3
+    pop this 1
+    push constant 40
+    call Array.new 1
+    pop this 2
+    push constant 40
+    pop this 5
+    push constant 0
+    pop local 0
+label BreakoutGame_0
+    push local 0
+    push constant 40
+    lt
+    not
+    if-goto BreakoutGame_1
+    push local 0
+    push local 0
+    push constant 10
+    call Math.divide 2
+    push constant 10
+    call Math.multiply 2
+    sub
+    push constant 50
+    call Math.multiply 2
+    push constant 7
+    add
+    pop local 1
+    push local 0
+    push constant 10
+    call Math.divide 2
+    push constant 15
+    call Math.multiply 2
+    push constant 40
+    add
+    pop local 2
+    push local 0
+    push this 2
+    add
+    push local 1
+    push local 2
+    push constant 45
+    push constant 10
+    call Brick.new 4
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push local 0
+    push constant 1
+    add
+    pop local 0
+    goto BreakoutGame_0
+label BreakoutGame_1
+    push constant 0
+    pop this 4
+    push constant 0
+    pop this 3
+    push pointer 0
+    call BreakoutGame.printScore 1
+    pop temp 0
+    push pointer 0
+    return
+function BreakoutGame.dispose 2
+    push argument 0
+    pop pointer 0
+    push this 0
+    call Paddle.dispose 1
+    pop temp 0
+    push this 1
+    call Ball.dispose 1
+    pop temp 0
+    push constant 0
+    pop local 0
+label BreakoutGame_2
+    push local 0
+    push constant 40
+    lt
+    not
+    if-goto BreakoutGame_3
+    push local 0
+    push this 2
+    add
+    pop pointer 1
+    push that 0
+    pop local 1
+    push local 1
+    call Brick.dispose 1
+    pop temp 0
+    push local 0
+    push constant 1
+    add
+    pop local 0
+    goto BreakoutGame_2
+label BreakoutGame_3
+    push this 2
+    call Array.dispose 1
+    pop temp 0
+    push pointer 0
+    call Memory.deAlloc 1
+    pop temp 0
+    push constant 0
+    return
+function BreakoutGame.printScore 0
+    push argument 0
+    pop pointer 0
+    push constant 0
+    push constant 0
+    call Output.moveCursor 2
+    pop temp 0
+    push constant 7
+    call String.new 1
+    push constant 83
+    call String.appendChar 2
+    push constant 99
+    call String.appendChar 2
+    push constant 111
+    call String.appendChar 2
+    push constant 114
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 58
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    call Output.printString 1
+    pop temp 0
+    push this 4
+    call Output.printInt 1
+    pop temp 0
+    push constant 0
+    return
+function BreakoutGame.run 2
+    push argument 0
+    pop pointer 0
+    push constant 0
+    pop local 1
+label BreakoutGame_4
+    push local 1
+    not
+    not
+    if-goto BreakoutGame_5
+label BreakoutGame_6
+    push local 0
+    push constant 0
+    eq
+    push local 1
+    not
+    and
+    not
+    if-goto BreakoutGame_7
+    call Keyboard.keyPressed 0
+    pop local 0
+    push pointer 0
+    call BreakoutGame.moveBallAndCollide 1
+    pop temp 0
+    push this 3
+    not
+    if-goto BreakoutGame_9
+    push constant 1
+    neg
+    pop local 1
+    goto BreakoutGame_8
+label BreakoutGame_9
+label BreakoutGame_8
+    push constant 10
+    call Sys.wait 1
+    pop temp 0
+    goto BreakoutGame_6
+label BreakoutGame_7
+label BreakoutGame_10
+    push local 0
+    push constant 0
+    eq
+    not
+    push local 1
+    not
+    and
+    not
+    if-goto BreakoutGame_11
+    push local 0
+    push constant 130
+    eq
+    not
+    if-goto BreakoutGame_13
+    push this 0
+    call Paddle.moveLeft 1
+    pop temp 0
+    goto BreakoutGame_12
+label BreakoutGame_13
+label BreakoutGame_12
+    push local 0
+    push constant 132
+    eq
+    not
+    if-goto BreakoutGame_15
+    push this 0
+    call Paddle.moveRight 1
+    pop temp 0
+    goto BreakoutGame_14
+label BreakoutGame_15
+label BreakoutGame_14
+    push local 0
+    push constant 113
+    eq
+    not
+    if-goto BreakoutGame_17
+    push constant 1
+    neg
+    pop local 1
+    goto BreakoutGame_16
+label BreakoutGame_17
+label BreakoutGame_16
+    push pointer 0
+    call BreakoutGame.moveBallAndCollide 1
+    pop temp 0
+    push this 3
+    not
+    if-goto BreakoutGame_19
+    push constant 1
+    neg
+    pop local 1
+    goto BreakoutGame_18
+label BreakoutGame_19
+label BreakoutGame_18
+    push constant 10
+    call Sys.wait 1
+    pop temp 0
+    call Keyboard.keyPressed 0
+    pop local 0
+    goto BreakoutGame_10
+label BreakoutGame_11
+    goto BreakoutGame_4
+label BreakoutGame_5
+    push constant 10
+    push constant 15
+    call Output.moveCursor 2
+    pop temp 0
+    push this 5
+    push constant 0
+    eq
+    not
+    if-goto BreakoutGame_21
+    push constant 8
+    call String.new 1
+    push constant 89
+    call String.appendChar 2
+    push constant 111
+    call String.appendChar 2
+    push constant 117
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 87
+    call String.appendChar 2
+    push constant 105
+    call String.appendChar 2
+    push constant 110
+    call String.appendChar 2
+    push constant 33
+    call String.appendChar 2
+    call Output.printString 1
+    pop temp 0
+    goto BreakoutGame_20
+label BreakoutGame_21
+    push constant 10
+    call String.new 1
+    push constant 71
+    call String.appendChar 2
+    push constant 97
+    call String.appendChar 2
+    push constant 109
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 32
+    call String.appendChar 2
+    push constant 79
+    call String.appendChar 2
+    push constant 118
+    call String.appendChar 2
+    push constant 101
+    call String.appendChar 2
+    push constant 114
+    call String.appendChar 2
+    push constant 33
+    call String.appendChar 2
+    call Output.printString 1
+    pop temp 0
+label BreakoutGame_20
+    push constant 0
+    return
+function BreakoutGame.moveBallAndCollide 5
+    push argument 0
+    pop pointer 0
+    push this 1
+    call Ball.move 1
+    pop temp 0
+    push this 1
+    call Ball.getX 1
+    pop local 0
+    push this 1
+    call Ball.getY 1
+    pop local 1
+    push this 1
+    call Ball.getRadius 1
+    pop local 2
+    push local 1
+    push local 2
+    add
+    push constant 255
+    lt
+    not
+    not
+    if-goto BreakoutGame_23
+    push constant 1
+    neg
+    pop this 3
+    push constant 0
+    return
+    goto BreakoutGame_22
+label BreakoutGame_23
+label BreakoutGame_22
+    push pointer 0
+    push this 1
+    push this 0
+    call BreakoutGame.isBallHittingPaddle 3
+    not
+    if-goto BreakoutGame_25
+    push this 1
+    call Ball.bounceY 1
+    pop temp 0
+    push constant 0
+    return
+    goto BreakoutGame_24
+label BreakoutGame_25
+label BreakoutGame_24
+    push constant 0
+    pop local 3
+label BreakoutGame_26
+    push local 3
+    push constant 40
+    lt
+    not
+    if-goto BreakoutGame_27
+    push local 3
+    push this 2
+    add
+    pop pointer 1
+    push that 0
+    pop local 4
+    push local 4
+    call Brick.getVisible 1
+    not
+    if-goto BreakoutGame_29
+    push pointer 0
+    push this 1
+    push local 4
+    call BreakoutGame.isBallHittingBrick 3
+    not
+    if-goto BreakoutGame_31
+    push local 4
+    call Brick.destroy 1
+    pop temp 0
+    push this 5
+    push constant 1
+    sub
+    pop this 5
+    push this 4
+    push constant 10
+    add
+    pop this 4
+    push pointer 0
+    call BreakoutGame.printScore 1
+    pop temp 0
+    push this 1
+    call Ball.bounceY 1
+    pop temp 0
+    push this 5
+    push constant 0
+    eq
+    not
+    if-goto BreakoutGame_33
+    push constant 1
+    neg
+    pop this 3
+    goto BreakoutGame_32
+label BreakoutGame_33
+label BreakoutGame_32
+    push constant 0
+    return
+    goto BreakoutGame_30
+label BreakoutGame_31
+label BreakoutGame_30
+    goto BreakoutGame_28
+label BreakoutGame_29
+label BreakoutGame_28
+    push local 3
+    push constant 1
+    add
+    pop local 3
+    goto BreakoutGame_26
+label BreakoutGame_27
+    push constant 0
+    return
+function BreakoutGame.isBallHittingBrick 9
+    push argument 0
+    pop pointer 0
+    push argument 1
+    call Ball.getX 1
+    pop local 0
+    push argument 1
+    call Ball.getY 1
+    pop local 1
+    push argument 1
+    call Ball.getRadius 1
+    pop local 2
+    push argument 2
+    call Brick.getX 1
+    pop local 3
+    push argument 2
+    call Brick.getY 1
+    pop local 4
+    push argument 2
+    call Brick.getWidth 1
+    pop local 5
+    push argument 2
+    call Brick.getHeight 1
+    pop local 6
+    push local 0
+    push local 2
+    add
+    push local 3
+    lt
+    push local 0
+    push local 2
+    sub
+    push local 3
+    push local 5
+    add
+    gt
+    or
+    not
+    pop local 7
+    push local 1
+    push local 2
+    add
+    push local 4
+    lt
+    push local 1
+    push local 2
+    sub
+    push local 4
+    push local 6
+    add
+    gt
+    or
+    not
+    pop local 8
+    push local 7
+    push local 8
+    and
+    return
+function BreakoutGame.isBallHittingPaddle 9
+    push argument 0
+    pop pointer 0
+    push argument 1
+    call Ball.getX 1
+    pop local 0
+    push argument 1
+    call Ball.getY 1
+    pop local 1
+    push argument 1
+    call Ball.getRadius 1
+    pop local 2
+    push argument 2
+    call Paddle.getX 1
+    pop local 3
+    push constant 235
+    pop local 4
+    push argument 2
+    call Paddle.getWidth 1
+    pop local 5
+    push constant 8
+    pop local 6
+    push local 0
+    push local 2
+    add
+    push local 3
+    lt
+    push local 0
+    push local 2
+    sub
+    push local 3
+    push local 5
+    add
+    gt
+    or
+    not
+    pop local 7
+    push local 1
+    push local 2
+    add
+    push local 4
+    lt
+    push local 1
+    push local 2
+    sub
+    push local 4
+    push local 6
+    add
+    gt
+    or
+    not
+    pop local 8
+    push local 7
+    push local 8
+    and
+    return

@@ -1,0 +1,141 @@
+/**
+ * 屏幕输出库。
+ * 提供了用于在屏幕上显示文本的服务。
+ * 使用 Screen 库进行底层绘制。
+ */
+class Output {
+    static Array charMaps;      // 存储字体位图数据
+    static int cursorX, cursorY; // 当前光标位置
+
+    /** 初始化 Output 库. */
+    function void init() {
+        let cursorX = 0;
+        let cursorY = 0;
+        do Output.initMap();
+        return;
+    }
+
+    /** 将光标移动到指定位置 (row, col). */
+    function void moveCursor(int i, int j) {
+        let cursorX = j * 8; // 每个字符宽8像素
+        let cursorY = i * 11; // 每个字符高11像素
+        return;
+    }
+
+    /** 在屏幕上打印字符 c. */
+    function void printChar(char c) {
+        var Array map;
+        var int i, rowData;
+
+        // 处理特殊字符
+        if (c = String.newLine()) {
+            do moveCursor(cursorY/11 + 1, 0);
+            return;
+        }
+        if (c = String.backSpace()) {
+            if (cursorX > 0) {
+                 do moveCursor(cursorY/11, (cursorX/8)-1);
+                 // 额外绘制一个空白字符以擦除
+            }
+            return;
+        }
+
+        // 绘制普通字符
+        let map = charMaps[c];
+        let i = 0;
+        while (i < 11) {
+            let rowData = map[i];
+            if (rowData > 0) {
+                do drawCharRow(rowData, cursorX, cursorY + i);
+            }
+            let i = i + 1;
+        }
+
+        // 前进光标
+        if (cursorX > 503) { // 511 - 8
+            do moveCursor(cursorY/11 + 1, 0);
+        } else {
+            do moveCursor(cursorY/11, cursorX/8 + 1);
+        }
+        return;
+    }
+
+    // 辅助函数，绘制字符的一行
+    function void drawCharRow(int row, int x, int y) {
+        var int i;
+        let i = 0;
+        while (i < 8) {
+            if (Math.bit(row, i)) {
+                do Screen.drawPixel(x + (7-i), y);
+            }
+            let i = i + 1;
+        }
+        return;
+    }
+
+
+    /** 打印字符串 s. */
+    function void printString(String s) {
+        var int i;
+        let i = 0;
+        while (i < s.length()) {
+            do printChar(s.charAt(i));
+            let i = i + 1;
+        }
+        return;
+    }
+
+    /** 打印整数 i. */
+    function void printInt(int i) {
+        var String s;
+        let s = String.new(6); // "-32768" 需要6个字符
+        do s.setInt(i);
+        do printString(s);
+        do s.dispose();
+        return;
+    }
+
+    /** 打印一个换行符. */
+    function void println() {
+        do printChar(String.newLine());
+        return;
+    }
+
+    /** 初始化字体位图数据. (数据量巨大，仅列出部分) */
+    function void initMap() {
+        let charMaps = Array.new(128);
+        // 此处需要填充所有128个ASCII字符的位图数据
+        // 每个字符由11个16位整数表示，每个整数代表一行的像素
+        // 这是一个非常繁琐的数据输入过程，以下为示例：
+        // 'A' (ASCII 65)
+        do Output.create(65,0,0,126,129,129,129,255,129,129,129,0,0);
+        // 'B' (ASCII 66)
+        do Output.create(66,0,0,255,129,129,254,129,129,129,255,0,0);
+        // ... 其他字符 ...
+        // '0' (ASCII 48)
+        do Output.create(48,0,0,126,195,165,189,189,165,195,126,0,0);
+        // ... 其他数字 ...
+        // 空格 (ASCII 32)
+        do Output.create(32,0,0,0,0,0,0,0,0,0,0,0,0);
+        return;
+    }
+
+    // 辅助函数，用于填充charMaps数组
+    function void create(int ascii, int r1, int r2, int r3, int r4, int r5, int r6, int r7, int r8, int r9, int r10, int r11) {
+        var Array map;
+        let map = Array.new(11);
+        let map[0] = r1;
+        let map[1] = r2;
+        let map[2] = r3;
+        let map[3] = r4;
+        let map[4] = r5;
+        let map[5] = r6;
+        let map[6] = r7;
+        let map[7] = r8;
+        let map[8] = r9;
+        let map[9] = r10;
+        let map[10] = r11;
+        let charMaps[ascii] = map;
+        return;
+    }
+}

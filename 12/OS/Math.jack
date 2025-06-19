@@ -1,0 +1,140 @@
+/**
+ * 数学运算库。
+ * 提供了一系列基本的数学函数。
+ */
+class Math {
+
+    // 预计算的2的幂，用于优化平方根计算
+    static Array twoToThe; 
+
+    /** 初始化数学库. */
+    function void init() {
+        // 创建一个数组来存储 2^0 到 2^15
+        let twoToThe = Array.new(16);
+        let twoToThe[0] = 1;
+        let twoToThe[1] = 2;
+        let twoToThe[2] = 4;
+        let twoToThe[3] = 8;
+        let twoToThe[4] = 16;
+        let twoToThe[5] = 32;
+        let twoToThe[6] = 64;
+        let twoToThe[7] = 128;
+        let twoToThe[8] = 256;
+        let twoToThe[9] = 512;
+        let twoToThe[10] = 1024;
+        let twoToThe[11] = 2048;
+        let twoToThe[12] = 4096;
+        let twoToThe[13] = 8192;
+        let twoToThe[14] = 16384;
+        // 2^15 = 32768，会是负数，所以我们手动设为 16384 * 2
+        let twoToThe[15] = 16384 + 16384; 
+        return;
+    }
+
+    /** 返回一个数的绝对值. */
+    function int abs(int x) {
+        if (x < 0) {
+            return -x;
+        }
+        return x;
+    }
+
+    /**
+     * 返回两个数的乘积。
+     * 使用“俄罗斯农民乘法”（移位和相加）的变体实现。
+     * 该实现处理了所有可能的正负数情况。
+     */
+    function int multiply(int x, int y) {
+        var int sum, shiftedX, i;
+        let sum = 0;
+        let shiftedX = x;
+        let i = 0;
+
+        // 循环16次，对应16位整数的每一位
+        while (i < 16) {
+            // 检查 y 的当前位是否为 1
+            if (Math.bit(y, i)) {
+                let sum = sum + shiftedX;
+            }
+            // 将 x 左移一位
+            let shiftedX = shiftedX + shiftedX;
+            let i = i + 1;
+        }
+        return sum;
+    }
+
+    /**
+     * 返回两个数的商。
+     * 当 y=0 或 x 为负数时，结果未定义。
+     */
+    function int divide(int x, int y) {
+        var int q, result;
+        var boolean neg;
+
+        // 处理 x, y 的正负号
+        if (y = 0) {
+            // 错误：除以0
+            do Sys.error(3);
+        }
+
+        let neg = ((x < 0) & (y > 0)) | ((x > 0) & (y < 0));
+        let x = Math.abs(x);
+        let y = Math.abs(y);
+
+        if (y > x) {
+            return 0;
+        }
+
+        let q = Math.divide(x, y + y);
+        let result = q + q;
+        if (~((x - (result * y)) < y)) { // if (x - 2*q*y >= y)
+            let result = result + 1;
+        }
+
+        if (neg) {
+            return -result;
+        }
+        return result;
+    }
+
+    /**
+     * 返回一个非负数的整数平方根。
+     * 使用二进制搜索的思想实现。
+     */
+    function int sqrt(int x) {
+        var int y, j, temp;
+        let y = 0;
+        // 从最高位开始（第15位，但我们用14位因为15位是符号位）
+        let j = 7;
+        while (~(j < 0)) {
+            // 尝试在结果 y 的第 j 位置上放一个 1
+            let temp = y + twoToThe[j];
+            if (~(temp * temp > x) & (temp * temp > 0)) { // 检查溢出和大小
+                let y = temp;
+            }
+            let j = j - 1;
+        }
+        return y;
+    }
+
+    /** 返回两个数中的较大者. */
+    function int max(int a, int b) {
+        if (a > b) {
+            return a;
+        }
+        return b;
+    }
+
+    /** 返回两个数中的较小者. */
+    function int min(int a, int b) {
+        if (a < b) {
+            return a;
+        }
+        return b;
+    }
+    
+    /** 返回 x 的第 i 位是否为 1. */
+    function boolean bit(int x, int i) {
+        return ~( (x & twoToThe[i]) = 0 );
+    }
+}

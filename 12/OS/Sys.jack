@@ -1,0 +1,49 @@
+/**
+ * 系统服务库。
+ * 提供了执行、时序和其他一些顶层服务。
+ */
+class Sys {
+
+    /** 启动操作系统，并调用 Main.main() 开始执行程序. */
+    function void init() {
+        do Math.init();
+        do Memory.init();
+        do Screen.init();
+        do Output.init();
+        do Keyboard.init();
+        // 调用主程序入口
+        do Main.main();
+        // Main.main 返回后，系统停止
+        do Sys.halt();
+        return;
+    }
+
+    /** 停止程序执行. */
+    function void halt() {
+        while (true) {}
+        return;
+    }
+
+    /** 等待大约 duration 毫秒. */
+    function void wait(int duration) {
+        var int i, j;
+        let i = 0;
+        // 这是一个粗略的忙等待循环，循环次数需要根据CPU速度进行调整
+        while (i < duration) {
+            let j = 0;
+            while (j < 200) { // 内循环用于消耗时间
+                let j = j + 1;
+            }
+            let i = i + 1;
+        }
+        return;
+    }
+
+    /** 打印错误信息并停止程序. */
+    function void error(int errorCode) {
+        do Output.printString("Error: ");
+        do Output.printInt(errorCode);
+        do Sys.halt();
+        return;
+    }
+}

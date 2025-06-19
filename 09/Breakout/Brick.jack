@@ -1,0 +1,62 @@
+// File: Brick.jack
+/**
+ * 代表一个可被小球摧毁的砖块。
+ */
+class Brick {
+    field int x, y;         // 砖块左上角的坐标
+    field int width, height;  // 砖块的尺寸
+    field boolean isVisible;  // 砖块是否可见
+
+    /** 构造函数：创建一个新的砖块。 */
+    constructor Brick new(int ax, int ay, int aWidth, int aHeight) {
+        let x = ax;
+        let y = ay;
+        let width = aWidth;
+        let height = aHeight;
+        let isVisible = true;  // 砖块初始时是可见的
+
+        do draw(); // 创建后立即在屏幕上绘制自己
+        return this;
+    }
+
+    /** 释放此砖块占用的内存。 */
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** 在屏幕上绘制砖块。 */
+    method void draw() {
+        do Screen.setColor(true);
+        do Screen.drawRectangle(x, y, x + width, y + height);
+        return;
+    }
+
+    /** 从屏幕上擦除砖块。 */
+    method void erase() {
+        do Screen.setColor(false);
+        do Screen.drawRectangle(x, y, x + width, y + height);
+        return;
+    }
+
+    /**
+     * 摧毁砖块：将其设置为不可见并从屏幕上擦除。
+     */
+    method void destroy() {
+        let isVisible = false;
+        do erase();
+        return;
+    }
+
+    /** 返回砖块是否可见。 */
+    method boolean getVisible() {
+        return isVisible;
+    }
+
+    /** 返回砖块的矩形边界，用于碰撞检测。 */
+    // Jack 不支持返回多个值或结构体，所以我们提供单独的 getter
+    method int getX() { return x; }
+    method int getY() { return y; }
+    method int getWidth() { return width; }
+    method int getHeight() { return height; }
+}

@@ -1,0 +1,133 @@
+/**
+ * 字符串处理库。
+ * 代表一个字符序列。
+ */
+class String {
+    field Array chars;        // 存储字符串字符的数组
+    field int length;         // 字符串当前长度
+    field int maxLength;      // 字符串最大容量
+
+    /** 创建一个最大长度为 maxLength 的新 String 对象. */
+    constructor String new(int maxLength) {
+        if (maxLength < 0) {
+             do Sys.error(6);
+        }
+        if (maxLength > 0) {
+            let chars = Array.new(maxLength);
+        }
+        let length = 0;
+        let maxLength = maxLength;
+        return this;
+    }
+
+    /** 释放 String 对象占用的内存. */
+    method void dispose() {
+        if (maxLength > 0) {
+            do Array.dispose(chars);
+        }
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** 返回字符串的当前长度. */
+    method int length() {
+        return length;
+    }
+
+    /** 返回字符串中第 j 个字符. */
+    method char charAt(int j) {
+        return chars[j];
+    }
+
+    /** 设置字符串中第 j 个字符为 c. */
+    method void setCharAt(int j, char c) {
+        let chars[j] = c;
+        return;
+    }
+
+    /** 将字符 c 追加到字符串末尾。如果超出最大长度则出错. */
+    method String appendChar(char c) {
+        if (length < maxLength) {
+            let chars[length] = c;
+            let length = length + 1;
+        } else {
+            do Sys.error(7);
+        }
+        return this;
+    }
+
+    /** 删除字符串的最后一个字符. */
+    method void eraseLastChar() {
+        if (length > 0) {
+            let length = length - 1;
+        }
+        return;
+    }
+
+    /** 返回字符串对应的整数值. */
+    method int intValue() {
+        var int val, i;
+        var boolean isNeg;
+        let val = 0;
+        let i = 0;
+        let isNeg = false;
+
+        if ((length > 0) & (chars[0] = 45)) { // 45 是 '-' 的 ASCII 码
+            let isNeg = true;
+            let i = 1;
+        }
+
+        while (i < length) {
+            let val = (val * 10) + (chars[i] - 48); // 48 是 '0' 的 ASCII 码
+            let i = i + 1;
+        }
+        if (isNeg) {
+            return -val;
+        }
+        return val;
+    }
+
+    /** 将字符串内容设置为整数 i 的字符串表示形式. */
+    method void setInt(int i) {
+        var int lastDigit;
+        let length = 0;
+        if (i < 0) {
+            do appendChar(45); // '-'
+            let i = -i;
+        }
+        do setInt_recursive(i);
+        // 如果是0，递归不会添加任何字符
+        if (length = 0) {
+            do appendChar(48); // '0'
+        }
+        return;
+    }
+
+    // setInt的递归辅助函数
+    method void setInt_recursive(int i) {
+        var int lastDigit;
+        if (i > 0) {
+            let lastDigit = i - (Math.multiply(Math.divide(i, 10), 10)); // i % 10
+            do setInt_recursive(Math.divide(i, 10));
+            do appendChar(lastDigit + 48);
+        }
+        return;
+    }
+
+    /** 返回退格符的字符码. */
+    function char backSpace() {
+        return 129;
+    }
+
+    /** 返回双引号的字符码. */
+    function char doubleQuote() {
+        return 34;
+    }
+
+
+
+    /** 返回换行符的字符码. */
+    function char newLine() {
+        return 128;
+    }
+}

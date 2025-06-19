@@ -1,0 +1,116 @@
+/**
+ * 屏幕绘制库。
+ * 提供了在物理屏幕上进行底层绘制的功能。
+ * 屏幕是一个 512x256 的黑白像素点阵，其内存在 16384 地址处开始。
+ */
+class Screen {
+    static boolean color;    // 当前绘图颜色 (true=black, false=white)
+    static Array screen;     // 显存基地址 16384
+
+    /** 初始化屏幕. */
+    function void init() {
+        let screen = 16384;
+        let color = true; // 默认为黑色
+        return;
+    }
+
+    /** 清除整个屏幕（设为白色）. */
+    function void clearScreen() {
+        var int i;
+        let i = 0;
+        while (i < 8192) {
+            let screen[i] = 0; // 0 代表白色
+            let i = i + 1;
+        }
+        return;
+    }
+
+    /** 设置当前绘图颜色. */
+    function void setColor(boolean b) {
+        let color = b;
+        return;
+    }
+
+    /** 在 (x, y) 坐标处绘制一个像素点. */
+    function void drawPixel(int x, int y) {
+        var int address, screenVal, bit;
+        // 计算像素所在的内存字地址和位
+        let address = (y * 32) + (x / 16);
+        let bit = Math.twoToThe(x & 15); // x & 15 is x % 16
+
+        // 读取-修改-写回
+        let screenVal = screen[address];
+        if (color) {
+            // 设置为黑色 (OR 操作)
+            let screen[address] = screenVal | bit;
+        } else {
+            // 设置为白色 (AND NOT 操作)
+            let screen[address] = screenVal & (~bit);
+        }
+        return;
+    }
+
+    /** 绘制一条从 (x1, y1) 到 (x2, y2) 的直线. */
+    function void drawLine(int x1, int y1, int x2, int y2) {
+        var int dx, dy, a, b, diff;
+        let a = 0;
+        let b = 0;
+        let dx = x2 - x1;
+        let dy = y2 - y1;
+        let diff = 0;
+
+        // Bresenham's line algorithm
+        while ((a <= dx) & (b <= dy)) {
+            do Screen.drawPixel(x1 + a, y1 + b);
+            if (diff < 0) {
+                let a = a + 1;
+                let diff = diff + dy;
+            } else {
+                let b = b + 1;
+                let diff = diff - dx;
+            }
+        }
+        return;
+    }
+
+    /** 绘制一个以 (x, y) 为左上角，宽为 width，高为 height 的矩形. */
+    function void drawRectangle(int x1, int y1, int x2, int y2) {
+        do Screen.drawLine(x1, y1, x2, y1);
+        do Screen.drawLine(x1, y2, x2, y2);
+        do Screen.drawLine(x1, y1, x1, y2);
+        do Screen.drawLine(x2, y1, x2, y2);
+        return;
+    }
+
+    /** 绘制一个以 (x, y) 为中心，半径为 r 的圆. */
+    function void drawCircle(int x, int y, int r) {
+        var int dx, dy;
+        let dy = r;
+        let dx = 0;
+        
+        // Midpoint circle algorithm
+        while (dx < dy) {
+            do Screen.drawPixel(x + dx, y + dy);
+            do Screen.drawPixel(x + dx, y - dy);
+            do Screen.drawPixel(x - dx, y + dy);
+            do Screen.drawPixel(x - dx, y - dy);
+            do Screen.drawPixel(x + dy, y + dx);
+            do Screen.drawPixel(x + dy, y - dx);
+            do Screen.drawPixel(x - dy, y + dx);
+            do Screen.drawPixel(x - dy, y - dx);
+
+            if ((dx*dx) + (dy*dy) > (r*r)) {
+                let dy = dy - 1;
+            }
+            let dx = dx + 1;
+        }
+        // 当 dx = dy 时，再画4个点
+        if (dx = dy) {
+            do Screen.drawPixel(x + dx, y + dy);
+            do Screen.drawPixel(x + dx, y - dy);
+            do Screen.drawPixel(x - dx, y + dy);
+            do Screen.drawPixel(x - dx, y - dy);
+        }
+        return;
+    }
+}

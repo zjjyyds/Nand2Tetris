@@ -1,0 +1,65 @@
+// Final version with corrected boundary checks.
+/**
+ * 代表玩家控制的挡板。
+ */
+class Paddle {
+    field int x, y;
+    field int width, height;
+
+    /** 构造函数，创建一个新的挡板。 */
+    constructor Paddle new(int startX, int startY, int pWidth, int pHeight) {
+        let x = startX;
+        let y = startY;
+        let width = pWidth;
+        let height = pHeight;
+        do draw();
+        return this;
+    }
+
+    /** 释放内存。 */
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** 在屏幕上绘制挡板。 */
+    method void draw() {
+        do Screen.setColor(true);
+        do Screen.drawRectangle(x, y, x + width, y + height);
+        return;
+    }
+
+    /** 清除屏幕上的挡板。 */
+    method void erase() {
+        do Screen.setColor(false);
+        do Screen.drawRectangle(x, y, x + width, y + height);
+        return;
+    }
+
+    /** 将挡板向左移动。 */
+    method void moveLeft() {
+        do erase();
+        let x = x - 5;
+        // *** 关键修正: 先移动，再检查并修正越界 ***
+        if (x < 0) {
+            let x = 0;
+        }
+        do draw();
+        return;
+    }
+
+    /** 将挡板向右移动。 */
+    method void moveRight() {
+        do erase();
+        let x = x + 5;
+        // *** 关键修正: 先移动，再检查并修正越界 ***
+        if ((x + width) > 511) {
+            let x = 511 - width;
+        }
+        do draw();
+        return;
+    }
+
+    method int getX() { return x; }
+    method int getWidth() { return width; }
+}

@@ -1,0 +1,165 @@
+// Final version with a more compatible syntax for the ">=" comparison.
+/**
+ * 管理打砖块游戏的所有元素和逻辑。
+ */
+class BreakoutGame {
+    field Paddle paddle;
+    field Ball ball;
+    field Array bricks;
+
+    field boolean gameOver;
+    field int score;
+    field int remainingBricks;
+
+    /** 构造函数。 */
+    constructor BreakoutGame new() {
+        var int i, brickX, brickY;
+        let paddle = Paddle.new(220, 235, 70, 8);
+        let ball = Ball.new(256, 222, 5); 
+
+        let bricks = Array.new(40);
+        let remainingBricks = 40;
+        let i = 0;
+        while (i < 40) {
+            let brickX = (i - ( (i / 10) * 10) ) * 50 + 7;
+            let brickY = (i / 10) * 15 + 40;
+            let bricks[i] = Brick.new(brickX, brickY, 45, 10);
+            let i = i + 1;
+        }
+        let score = 0;
+        let gameOver = false;
+        do printScore();
+        return this;
+    }
+
+    /** 释放内存。 */
+    method void dispose() {
+        var int i;
+        var Brick currentBrick;
+        do paddle.dispose();
+        do ball.dispose();
+        let i = 0;
+        while (i < 40) {
+            let currentBrick = bricks[i];
+            do currentBrick.dispose();
+            let i = i + 1;
+        }
+        do bricks.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** 打印分数。 */
+    method void printScore() {
+        do Output.moveCursor(0, 0);
+        do Output.printString("Score: ");
+        do Output.printInt(score);
+        return;
+    }
+
+    /** 游戏主循环。 */
+    method void run() {
+        var char key;
+        var boolean exit;
+        let exit = false;
+        while (~exit) {
+            while ((key = 0) & (~exit)) {
+                let key = Keyboard.keyPressed();
+                do moveBallAndCollide();
+                if (gameOver) { let exit = true; }
+                do Sys.wait(10);
+            }
+            while ((~(key = 0)) & (~exit)) {
+                if (key = 130) { do paddle.moveLeft(); }
+                if (key = 132) { do paddle.moveRight(); }
+                if (key = 113) { let exit = true; }
+                do moveBallAndCollide();
+                if (gameOver) { let exit = true; }
+                do Sys.wait(10);
+                let key = Keyboard.keyPressed();
+            }
+        }
+        do Output.moveCursor(10, 15);
+        if (remainingBricks = 0) { do Output.printString("You Win!"); }
+        else { do Output.printString("Game Over!"); }
+        return;
+    }
+
+    /** 处理小球移动和所有碰撞逻辑。 */
+    method void moveBallAndCollide() {
+        var int ballX, ballY, ballR, i;
+        var Brick currentBrick;
+
+        do ball.move();
+
+        let ballX = ball.getX();
+        let ballY = ball.getY();
+        let ballR = ball.getRadius();
+
+        // GameController 判断游戏是否结束的条件
+        // *** 关键修正: 将 >= 写成更兼容的 ~(... < ...) 形式 ***
+        if (~((ballY + ballR) < 255)) {
+            let gameOver = true;
+            return;
+        }
+
+        if (isBallHittingPaddle(ball, paddle)) {
+            do ball.bounceY();
+            return;
+        }
+
+        let i = 0;
+        while(i < 40) {
+            let currentBrick = bricks[i];
+            if (currentBrick.getVisible()) {
+                if (isBallHittingBrick(ball, currentBrick)) {
+                    do currentBrick.destroy();
+                    let remainingBricks = remainingBricks - 1;
+                    let score = score + 10;
+                    do printScore();
+                    do ball.bounceY();
+                    if (remainingBricks = 0) {
+                        let gameOver = true;
+                    }
+                    return;
+                }
+            }
+            let i = i + 1;
+        }
+        return;
+    }
+
+    /** 判断小球是否与砖块碰撞。 */
+    method boolean isBallHittingBrick(Ball b, Brick br) {
+        var int ballX, ballY, ballR;
+        var int brickX, brickY, brickW, brickH;
+        var boolean xOverlap, yOverlap;
+        let ballX = b.getX();
+        let ballY = b.getY();
+        let ballR = b.getRadius();
+        let brickX = br.getX();
+        let brickY = br.getY();
+        let brickW = br.getWidth();
+        let brickH = br.getHeight();
+        let xOverlap = ~(((ballX + ballR) < brickX) | ((ballX - ballR) > (brickX + brickW)));
+        let yOverlap = ~(((ballY + ballR) < brickY) | ((ballY - ballR) > (brickY + brickH)));
+        return xOverlap & yOverlap;
+    }
+
+    /** 判断小球是否与挡板碰撞。 */
+    method boolean isBallHittingPaddle(Ball b, Paddle p) {
+        var int ballX, ballY, ballR;
+        var int paddleX, paddleY, paddleW, paddleH;
+        var boolean xOverlap, yOverlap;
+        let ballX = b.getX();
+        let ballY = b.getY();
+        let ballR = b.getRadius();
+        let paddleX = p.getX();
+        let paddleY = 235;
+        let paddleW = p.getWidth();
+        let paddleH = 8;
+        let xOverlap = ~(((ballX + ballR) < paddleX) | ((ballX - ballR) > (paddleX + paddleW)));
+        let yOverlap = ~(((ballY + ballR) < paddleY) | ((ballY - ballR) > (paddleY + paddleH)));
+        return xOverlap & yOverlap;
+    }
+}

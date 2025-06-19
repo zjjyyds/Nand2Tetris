@@ -1,0 +1,75 @@
+/**
+ * 键盘输入库。
+ * 提供了用于处理键盘输入的函数。
+ */
+class Keyboard {
+    static int KBD; // 键盘内存映射地址 24576
+
+    /** 初始化键盘库. */
+    function void init() {
+        let KBD = 24576;
+        return;
+    } 
+
+    /**
+     * 返回当前被按下的键的字符码。
+     * 如果没有键被按下，返回 0。
+     * 这是一个非阻塞函数。
+     */
+    function char keyPressed() {
+        return Memory.peek(KBD);
+    }
+
+    /**
+     * 等待用户按下一个键，并返回该键的字符码。
+     * 这是一个阻塞函数。
+     */
+    function char readChar() {
+        var char c;
+        // 等待按键按下
+        while (Keyboard.keyPressed() = 0) {}
+        let c = Keyboard.keyPressed();
+        // 等待按键释放
+        while (~(Keyboard.keyPressed() = 0)) {}
+        return c;
+    }
+
+    /**
+     * 显示提示信息，读取一行文本直到用户按下回车键，
+     * 并返回这行文本。
+     */
+    function String readLine(String message) {
+        var String s;
+        var char c;
+        let s = String.new(64); // 假设一行最多64个字符
+        do Output.printString(message);
+
+        while (true) {
+            let c = Keyboard.readChar();
+            if (c = String.newLine()) {
+                do Output.println();
+                return s;
+            }
+            if (c = String.backSpace()) {
+                if (s.length() > 0) {
+                    do s.eraseLastChar();
+                    do Output.backSpace();
+                }
+            } else {
+                do s.appendChar(c);
+                do Output.printChar(c);
+            }
+        }
+        return s;
+    }   
+
+    /**
+     * 显示提示信息，读取一行代表整数的文本，
+     * 并返回该整数。
+     */
+    function int readInt(String message) {
+        var String s;
+        let s = Keyboard.readLine(message);
+        return s.intValue();
+    }
+}

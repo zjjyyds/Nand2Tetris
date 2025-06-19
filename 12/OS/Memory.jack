@@ -1,0 +1,93 @@
+/**
+ * 内存操作库。
+ * 提供了对 RAM 的直接访问，并管理动态分配的内存堆。
+ * 使用一个空闲块的链表来实现内存管理。每个块的第一个字存储块的大小，第二个字存储下一个空闲块的地址。
+ */
+class Memory {
+    static Array memory;      // 伪数组，用于直接访问内存
+    static Array freeList;    // 指向第一个空闲内存块的指针
+
+    /** 初始化内存管理器. */
+    function void init() {
+        let memory = 0;
+        // 堆从地址 2048 开始，大小为 14336 (16384 - 2048)
+        let freeList = 2048;
+        let freeList[0] = 14336; // 初始空闲块的大小
+        let freeList[1] = null;  // 没有下一个空闲块
+        return;
+    }
+
+    /** 返回指定内存地址的值. */
+    function int peek(int address) {
+        return memory[address];
+    }
+
+    /** 将指定内存地址的值设为给定值. */
+    function void poke(int address, int value) {
+        let memory[address] = value;
+        return;
+    }
+
+    /**
+     * 寻找并分配一个大小至少为 size 的内存块。
+     * 返回指向已分配内存块的指针。
+     */
+    function int alloc(int size) {
+        var Array current, prev;
+        var int blockSize;
+
+        let current = freeList;
+        let prev = null;
+
+        while (~(current = null)) {
+            let blockSize = current[0];
+            // 检查当前块是否足够大
+            if (blockSize > (size + 1)) {
+                // 如果块足够大，就分割它
+                // newBlockStart 指向分割后剩余空闲块的起始位置
+                var int newBlockStart;
+                let newBlockStart = current + size + 1;
+                let memory[newBlockStart] = blockSize - size - 1;
+                let memory[newBlockStart+1] = current[1];
+
+                if (prev = null) {
+                    let freeList = newBlockStart;
+                } else {
+                    let prev[1] = newBlockStart;
+                }
+                // 返回分配的块（在长度头之后）
+                return current + 1;
+            }
+            if (blockSize = (size + 1)) {
+                // 如果大小正好匹配，直接使用整个块
+                if (prev = null) {
+                    let freeList = current[1];
+                } else {
+                    let prev[1] = current[1];
+                }
+                return current + 1;
+            }
+
+            // 移动到下一个空闲块
+            let prev = current;
+            let current = current[1];
+        }
+        // 如果没有找到足够的内存，则出错
+        do Sys.error(4);
+        return -1;
+    }
+
+    /**
+     * 释放一个之前由 alloc 分配的内存块。
+     * object: 指向要被释放的内存块的指针。
+     */
+    function void deAlloc(int object) {
+        var Array block;
+        // block 指针指向内存块的头部（长度信息所在处）
+        let block = object - 1;
+        // 将释放的块添加到空闲列表的头部
+        let block[1] = freeList;
+        let freeList = block;
+        return;
+    }    
+}

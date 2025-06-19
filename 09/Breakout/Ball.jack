@@ -1,0 +1,97 @@
+// Final perfect version with position correction for all four walls.
+/**
+ * 代表一个使用速度向量 (vx, vy) 移动的小球。
+ */
+class Ball {
+    field int x, y;
+    field int radius;
+    field int velocityX, velocityY;
+
+    /** 构造函数, 创建一个带有初始速度的新小球。 */
+    constructor Ball new(int startX, int startY, int r) {
+        let x = startX;
+        let y = startY;
+        let radius = r;
+        let velocityX = 3;
+        let velocityY = 3;
+        do draw();
+        return this;
+    }
+
+    /** 释放内存。 */
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** 绘制小球。 */
+    method void draw() {
+        do Screen.setColor(true);
+        do Screen.drawCircle(x, y, radius);
+        return;
+    }
+
+    /** 擦除小球。 */
+    method void erase() {
+        do Screen.setColor(false);
+        do Screen.drawCircle(x, y, radius);
+        return;
+    }
+
+    /**
+     * 将小球移动一步, 并内置了所有墙壁碰撞检测、反弹及位置修正。
+     */
+    method void move() {
+        do erase();
+
+        // 根据速度更新坐标
+        let x = x + velocityX;
+        let y = y + velocityY;
+
+        // --- 边界检测、速度反弹 和 位置修正 ---
+        
+        // 左墙壁
+        if ((x - radius) < 0) {
+            let velocityX = -velocityX; // 1. 速度反向
+            let x = radius;             // 2. 将位置修正到边界上
+        }
+        
+        // 右墙壁
+        if ((x + radius) > 511) {
+            let velocityX = -velocityX; // 1. 速度反向
+            let x = 511 - radius;       // 2. 将位置修正到边界上
+        }
+        
+        // 上方墙壁
+        if ((y - radius) < 0) {
+            let velocityY = -velocityY; // 1. 速度反向
+            let y = radius;             // 2. 将位置修正到边界上
+        }
+
+        // *** 关键修正: 处理下边界，防止越界绘图 ***
+        // 我们不在这里反弹，但必须把位置限制在屏幕内
+        if ((y + radius) > 255) {
+            let y = 255 - radius;
+        }
+        
+        // 重绘小球，此时的位置保证是合法的
+        do draw();
+        return;
+    }
+
+    /** 将小球的垂直速度反向（用于挡板和砖块碰撞）。 */
+    method void bounceY() {
+        let velocityY = -velocityY;
+        return;
+    }
+
+    /** 将小球的水平速度反向。 */
+    method void bounceX() {
+        let velocityX = -velocityX;
+        return;
+    }
+
+    method int getX() { return x; }
+    method int getY() { return y; }
+    method int getRadius() { return radius; }
+}
